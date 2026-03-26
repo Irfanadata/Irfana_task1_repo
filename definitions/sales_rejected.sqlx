@@ -1,0 +1,40 @@
+config {
+  type: "table",
+  schema: "retail_silver",
+  name: "sales_rejected"
+}
+
+SELECT
+  store_id,
+  product_id,
+  product_name,
+  quantity,
+  price,
+  sale_timestamp,
+
+  REGEXP_EXTRACT(_FILE_NAME, r'[^/]+$') AS filename,
+
+  CASE
+    WHEN product_name IS NULL OR product_name = 'NULL' THEN 'Invalid product_name'
+    WHEN SAFE_CAST(store_id AS INT64) IS NULL THEN 'Invalid store_id'
+    WHEN SAFE_CAST(product_id AS INT64) IS NULL THEN 'Invalid product_id'
+    WHEN SAFE_CAST(quantity AS INT64) IS NULL THEN 'Invalid quantity'
+    WHEN SAFE_CAST(quantity AS INT64) <= 0 THEN 'Negative or zero quantity'
+    WHEN SAFE_CAST(price AS FLOAT64) IS NULL THEN 'Invalid price'
+    WHEN SAFE_CAST(price AS FLOAT64) <= 0 THEN 'Negative or zero price'
+    WHEN SAFE_CAST(sale_timestamp AS TIMESTAMP) IS NULL THEN 'Invalid timestamp'
+    ELSE 'Unknown error'
+  END AS rejection_reason
+
+FROM `bilvantisaimlproject.retail_raw_irfana.sales_ext_irfana`
+
+WHERE
+  product_name IS NULL
+  OR product_name = 'NULL'
+  OR SAFE_CAST(store_id AS INT64) IS NULL
+  OR SAFE_CAST(product_id AS INT64) IS NULL
+  OR SAFE_CAST(quantity AS INT64) IS NULL
+  OR SAFE_CAST(quantity AS INT64) <= 0
+  OR SAFE_CAST(price AS FLOAT64) IS NULL
+  OR SAFE_CAST(price AS FLOAT64) <= 0
+  OR SAFE_CAST(sale_timestamp AS TIMESTAMP) IS NULL

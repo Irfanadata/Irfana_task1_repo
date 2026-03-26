@@ -1,0 +1,50 @@
+config {
+  type: "table",
+  schema: "retail_silver",
+  name: "sales_audit"
+}
+
+WITH base AS (
+  SELECT
+    REGEXP_EXTRACT(_FILE_NAME, r'[^/]+$') AS filename,
+
+    product_name,
+    SAFE_CAST(store_id AS INT64) AS store_id,
+    SAFE_CAST(product_id AS INT64) AS product_id,
+    SAFE_CAST(quantity AS INT64) AS quantity,
+    SAFE_CAST(price AS FLOAT64) AS price,
+    SAFE_CAST(sale_timestamp AS TIMESTAMP) AS sale_ts
+
+  FROM `bilvantisaimlproject.retail_raw_irfana.sales_ext_irfana`
+)
+
+SELECT
+  filename,
+
+  COUNTIF(
+    product_name IS NOT NULL
+    AND product_name != 'NULL'
+    AND store_id IS NOT NULL
+    AND product_id IS NOT NULL
+    AND quantity IS NOT NULL AND quantity > 0
+    AND price IS NOT NULL AND price > 0
+    AND sale_ts IS NOT NULL
+  ) AS records_inserted,
+
+  CURRENT_DATE() AS processing_date,
+
+  CASE 
+    WHEN COUNTIF(
+      product_name IS NOT NULL
+      AND product_name != 'NULL'
+      AND store_id IS NOT NULL
+      AND product_id IS NOT NULL
+      AND quantity IS NOT NULL AND quantity > 0
+      AND price IS NOT NULL AND price > 0
+      AND sale_ts IS NOT NULL
+    ) > 0 THEN 'VALID'
+    ELSE 'INVALID'
+  END AS validation_flag
+
+FROM base
+GROUP BY filename
