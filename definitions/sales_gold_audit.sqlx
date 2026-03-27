@@ -19,25 +19,66 @@
 
 -- FROM ${ref("sales_gold")}
 
+-- config {
+--   type: "incremental",
+--   schema: "retail_gold",
+--   name: "sales_gold_audit"
+-- }
+
+-- SELECT
+--   sale_date,
+--   COUNT(*) AS total_rows,
+--   SUM(total_sales_amount) AS total_sales_amount,
+--   SUM(total_quantity_sold) AS total_quantity_sold,
+--   CURRENT_TIMESTAMP() AS load_timestamp
+
+-- FROM ${ref("sales_gold")}
+
+-- -- same filtering logic (optional if gold already filtered)
+-- WHERE sale_date = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
+
+-- GROUP BY sale_date
+
+
+
+
 config {
-  type: "incremental",
+  type: "table",
   schema: "retail_gold",
   name: "sales_gold_audit"
 }
 
 SELECT
-  sale_date,
+  file_date,
   COUNT(*) AS total_rows,
   SUM(total_sales_amount) AS total_sales_amount,
   SUM(total_quantity_sold) AS total_quantity_sold,
   CURRENT_TIMESTAMP() AS load_timestamp
-
 FROM ${ref("sales_gold")}
+GROUP BY file_date
 
--- same filtering logic (optional if gold already filtered)
-WHERE sale_date = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
 
-GROUP BY sale_date
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

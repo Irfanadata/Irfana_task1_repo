@@ -1,3 +1,10 @@
+-- 
+
+
+
+
+
+
 config {
   type: "incremental",
   schema: "retail_silver",
@@ -13,6 +20,9 @@ SELECT
   sale_timestamp,
 
   REGEXP_EXTRACT(_FILE_NAME, r'[^/]+$') AS filename,
+
+  -- optional: add file_date here also
+  PARSE_DATE('%Y%m%d', REGEXP_EXTRACT(_FILE_NAME, r'\d{8}')) AS file_date,
 
   CASE
     WHEN product_name IS NULL OR product_name = 'NULL' THEN 'Invalid product_name'

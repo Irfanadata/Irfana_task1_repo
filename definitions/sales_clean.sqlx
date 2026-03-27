@@ -1,3 +1,43 @@
+-- config {
+--   type: "incremental",
+--   schema: "retail_silver",
+--   name: "sales_clean"
+-- }
+
+-- SELECT
+--   SAFE_CAST(store_id AS INT64) AS store_id,
+--   SAFE_CAST(product_id AS INT64) AS product_id,
+--   product_name,
+
+--   SAFE_CAST(quantity AS INT64) AS quantity,
+--   SAFE_CAST(price AS FLOAT64) AS price,
+
+--   DATE(SAFE_CAST(sale_timestamp AS TIMESTAMP)) AS sale_date,
+
+--   SAFE_CAST(quantity AS FLOAT64) * SAFE_CAST(price AS FLOAT64) AS total_amount
+
+-- FROM `bilvantisaimlproject.retail_raw_irfana.sales_ext_irfana`
+
+-- WHERE
+--   -- product validation
+--   product_name IS NOT NULL
+--   AND product_name != 'NULL'
+
+--   -- ID validation
+--   AND SAFE_CAST(store_id AS INT64) IS NOT NULL
+--   AND SAFE_CAST(product_id AS INT64) IS NOT NULL
+
+--   -- numeric validation
+--   AND SAFE_CAST(quantity AS INT64) IS NOT NULL
+--   AND SAFE_CAST(quantity AS INT64) > 0
+
+--   AND SAFE_CAST(price AS FLOAT64) IS NOT NULL
+--   AND SAFE_CAST(price AS FLOAT64) > 0
+
+--   -- timestamp validation
+--   AND SAFE_CAST(sale_timestamp AS TIMESTAMP) IS NOT NULL
+
+
 config {
   type: "incremental",
   schema: "retail_silver",
@@ -14,25 +54,58 @@ SELECT
 
   DATE(SAFE_CAST(sale_timestamp AS TIMESTAMP)) AS sale_date,
 
-  SAFE_CAST(quantity AS FLOAT64) * SAFE_CAST(price AS FLOAT64) AS total_amount
+  SAFE_CAST(quantity AS FLOAT64) * SAFE_CAST(price AS FLOAT64) AS total_amount,
+
+  PARSE_DATE('%Y%m%d', REGEXP_EXTRACT(_FILE_NAME, r'\d{8}')) AS file_date
 
 FROM `bilvantisaimlproject.retail_raw_irfana.sales_ext_irfana`
 
 WHERE
-  -- product validation
   product_name IS NOT NULL
   AND product_name != 'NULL'
 
-  -- ID validation
   AND SAFE_CAST(store_id AS INT64) IS NOT NULL
   AND SAFE_CAST(product_id AS INT64) IS NOT NULL
 
-  -- numeric validation
   AND SAFE_CAST(quantity AS INT64) IS NOT NULL
   AND SAFE_CAST(quantity AS INT64) > 0
 
   AND SAFE_CAST(price AS FLOAT64) IS NOT NULL
   AND SAFE_CAST(price AS FLOAT64) > 0
 
-  -- timestamp validation
   AND SAFE_CAST(sale_timestamp AS TIMESTAMP) IS NOT NULL
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

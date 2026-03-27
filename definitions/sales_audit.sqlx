@@ -1,3 +1,6 @@
+-- 
+
+
 config {
   type: "incremental",
   schema: "retail_silver",
@@ -7,6 +10,7 @@ config {
 WITH base AS (
   SELECT
     REGEXP_EXTRACT(_FILE_NAME, r'[^/]+$') AS filename,
+    PARSE_DATE('%Y%m%d', REGEXP_EXTRACT(_FILE_NAME, r'\d{8}')) AS file_date,
 
     product_name,
     SAFE_CAST(store_id AS INT64) AS store_id,
@@ -20,31 +24,32 @@ WITH base AS (
 
 SELECT
   filename,
+  file_date,
 
   COUNTIF(
-    product_name IS NOT NULL
-    AND product_name != 'NULL'
-    AND store_id IS NOT NULL
-    AND product_id IS NOT NULL
-    AND quantity IS NOT NULL AND quantity > 0
-    AND price IS NOT NULL AND price > 0
-    AND sale_ts IS NOT NULL
+    base.product_name IS NOT NULL
+    AND base.product_name != 'NULL'
+    AND base.store_id IS NOT NULL
+    AND base.product_id IS NOT NULL
+    AND base.quantity IS NOT NULL AND base.quantity > 0
+    AND base.price IS NOT NULL AND base.price > 0
+    AND base.sale_ts IS NOT NULL
   ) AS records_inserted,
 
   CURRENT_DATE() AS processing_date,
 
   CASE 
     WHEN COUNTIF(
-      product_name IS NOT NULL
-      AND product_name != 'NULL'
-      AND store_id IS NOT NULL
-      AND product_id IS NOT NULL
-      AND quantity IS NOT NULL AND quantity > 0
-      AND price IS NOT NULL AND price > 0
-      AND sale_ts IS NOT NULL
+      base.product_name IS NOT NULL
+      AND base.product_name != 'NULL'
+      AND base.store_id IS NOT NULL
+      AND base.product_id IS NOT NULL
+      AND base.quantity IS NOT NULL AND base.quantity > 0
+      AND base.price IS NOT NULL AND base.price > 0
+      AND base.sale_ts IS NOT NULL
     ) > 0 THEN 'VALID'
     ELSE 'INVALID'
   END AS validation_flag
 
 FROM base
-GROUP BY filename
+GROUP BY filename, file_date
