@@ -1,20 +1,40 @@
+-- config {
+--   type: "incremental",
+--   schema: "retail_gold",
+--   name: "sales_gold_audit"
+-- }
+
+-- SELECT
+--   COUNT(*) AS total_aggregated_rows,
+
+--   MIN(sale_date) AS start_date,
+--   MAX(sale_date) AS end_date,
+
+--   CASE 
+--     WHEN COUNT(*) > 0 THEN 'SUCCESS'
+--     ELSE 'FAILURE'
+--   END AS status,
+
+--   CURRENT_TIMESTAMP() AS processing_timestamp
+
+-- FROM ${ref("sales_gold")}
+
 config {
-  type: "incremental",
+  type: "table",
   schema: "retail_gold",
   name: "sales_gold_audit"
 }
 
 SELECT
-  COUNT(*) AS total_aggregated_rows,
-
-  MIN(sale_date) AS start_date,
-  MAX(sale_date) AS end_date,
-
-  CASE 
-    WHEN COUNT(*) > 0 THEN 'SUCCESS'
-    ELSE 'FAILURE'
-  END AS status,
-
-  CURRENT_TIMESTAMP() AS processing_timestamp
+  sale_date,
+  COUNT(*) AS total_rows,
+  SUM(total_sales_amount) AS total_sales_amount,
+  SUM(total_quantity_sold) AS total_quantity_sold,
+  CURRENT_TIMESTAMP() AS load_timestamp
 
 FROM ${ref("sales_gold")}
+
+-- same filtering logic (optional if gold already filtered)
+WHERE sale_date = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
+
+GROUP BY sale_date

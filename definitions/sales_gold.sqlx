@@ -1,3 +1,25 @@
+-- config {
+--   type: "incremental",
+--   schema: "retail_gold",
+--   name: "sales_gold"
+-- }
+
+-- SELECT
+--   sale_date,
+--   store_id,
+
+--   SUM(total_amount) AS total_sales_amount,
+--   SUM(quantity) AS total_quantity_sold,
+--   COUNT(DISTINCT product_id) AS unique_products_sold
+
+-- FROM ${ref("sales_clean")}
+
+-- GROUP BY
+--   sale_date,
+--   store_id
+
+
+
 config {
   type: "incremental",
   schema: "retail_gold",
@@ -7,13 +29,13 @@ config {
 SELECT
   sale_date,
   store_id,
-
   SUM(total_amount) AS total_sales_amount,
   SUM(quantity) AS total_quantity_sold,
   COUNT(DISTINCT product_id) AS unique_products_sold
 
 FROM ${ref("sales_clean")}
 
-GROUP BY
-  sale_date,
-  store_id
+-- process yesterday's data
+WHERE sale_date = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
+
+GROUP BY sale_date, store_id
