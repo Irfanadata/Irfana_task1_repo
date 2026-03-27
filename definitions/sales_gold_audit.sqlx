@@ -20,7 +20,7 @@
 -- FROM ${ref("sales_gold")}
 
 config {
-  type: "table",
+  type: "incremental",
   schema: "retail_gold",
   name: "sales_gold_audit"
 }
