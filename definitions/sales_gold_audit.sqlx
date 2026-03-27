@@ -35,7 +35,7 @@ SELECT
 FROM ${ref("sales_gold")}
 
 -- same filtering logic (optional if gold already filtered)
-WHERE sale_date = DATE_SUB(CURRENT_DATE(), INTERVAL 8 DAY)
+WHERE sale_date = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
 
 GROUP BY sale_date
 

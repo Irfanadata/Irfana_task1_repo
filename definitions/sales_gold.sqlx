@@ -37,7 +37,7 @@ SELECT
 FROM ${ref("sales_clean")}
 
 -- process yesterday's data
-WHERE sale_date = DATE_SUB(CURRENT_DATE(), INTERVAL 8 DAY)
+WHERE sale_date = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
 
 GROUP BY sale_date, store_id
 
