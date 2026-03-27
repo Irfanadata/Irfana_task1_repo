@@ -20,6 +20,7 @@
 
 
 
+
 config {
   type: "incremental",
   schema: "retail_gold",
@@ -39,3 +40,25 @@ FROM ${ref("sales_clean")}
 WHERE sale_date = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
 
 GROUP BY sale_date, store_id
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
